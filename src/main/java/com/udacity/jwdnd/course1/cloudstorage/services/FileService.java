@@ -27,7 +27,7 @@ public class FileService {
         System.out.println("Creating FileService bean");
     }
 
-    public File addFile(MultipartFile multipartFile, Authentication authentication) throws IOException {
+    public File addItem(MultipartFile multipartFile, Authentication authentication) throws IOException {
         Integer userId = this.userService.getUser(authentication.getName()).getUserId();
 
         File file = new File();
@@ -45,5 +45,13 @@ public class FileService {
 
     public List<File> getAllFiles(Integer userId) {
         return fileMapper.getAllFiles(userId);
+    }
+
+    public void deleteFile(int fileId) {
+        fileMapper.deleteItem(fileId);
+    }
+
+    public File getFile(int fileId) {
+        return fileMapper.getFile(fileId);
     }
 }

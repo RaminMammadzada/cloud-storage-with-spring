@@ -3,8 +3,11 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -32,9 +35,27 @@ public class FileController {
             return "home";
         }
 
-        File addedFile = fileService.addFile(file, authentication);
+        File addedFile = fileService.addItem(file, authentication);
         System.out.printf("The file %s is saved", addedFile.getFileName());
 
         return "redirect:/home";
+    }
+
+    @GetMapping("/files/delete/{fileId}")
+    public String deleteFile(@PathVariable("fileId") int fileId) {
+        this.fileService.deleteFile(fileId);
+
+        return "redirect:/home";
+    }
+
+    @GetMapping("/files/view/{fileId}")
+    public ResponseEntity<InputStreamSource> viewFile(@PathVariable("fileId") Integer fileId) {
+        File file = this.fileService.getFile(fileId);
+
+        ByteArrayResource resource = new ByteArrayResource(file.getFileData());
+        MediaType mt = MediaType.parseMediaType(file.getContentType());
+
+        return ResponseEntity.ok().contentType(mt).header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getFileName() + "\"").body(resource);
     }
 }
