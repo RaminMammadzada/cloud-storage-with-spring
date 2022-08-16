@@ -15,7 +15,7 @@ public interface FileMapper {
     @Options(useGeneratedKeys = true, keyProperty = "fileId")
     int insert(File file);
 
-    @Select("SELECT * FROM FILES WHERE userId = #{userId}")
+    @Select("SELECT * FROM FILES WHERE userid = #{userId}")
     List<File> getAllFiles(int userId);
 
     @Delete("DELETE FROM FILES WHERE fileId = #{fileId}")
