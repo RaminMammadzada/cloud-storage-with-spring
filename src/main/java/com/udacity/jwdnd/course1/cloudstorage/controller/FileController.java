@@ -30,7 +30,7 @@ public class FileController {
     }
 
     @PostMapping("/fileUpload")
-    public String uploadFile(@RequestParam("fileUpload") MultipartFile file, Authentication authentication) throws IOException {
+    public String uploadFile(@RequestParam("fileUpload") MultipartFile file, Authentication authentication, RedirectAttributes redirectAttributes) throws IOException {
         if (file.isEmpty()) {
             return "home";
         }
@@ -38,23 +38,25 @@ public class FileController {
         File addedFile = fileService.addItem(file, authentication);
         System.out.printf("The file %s is saved", addedFile.getFileName());
 
+        redirectAttributes.addFlashAttribute("activeTab", "files");
         return "redirect:/home";
     }
 
     @GetMapping("/files/delete/{fileId}")
-    public String deleteFile(@PathVariable("fileId") int fileId) {
+    public String deleteFile(@PathVariable("fileId") int fileId, RedirectAttributes redirectAttributes) {
         this.fileService.deleteFile(fileId);
-
+        redirectAttributes.addFlashAttribute("activeTab", "files");
         return "redirect:/home";
     }
 
     @GetMapping("/files/view/{fileId}")
-    public ResponseEntity<InputStreamSource> viewFile(@PathVariable("fileId") Integer fileId) {
+    public ResponseEntity<InputStreamSource> viewFile(@PathVariable("fileId") Integer fileId, RedirectAttributes redirectAttributes) {
         File file = this.fileService.getFile(fileId);
 
         ByteArrayResource resource = new ByteArrayResource(file.getFileData());
         MediaType mt = MediaType.parseMediaType(file.getContentType());
 
+        redirectAttributes.addFlashAttribute("activeTab", "files");
         return ResponseEntity.ok().contentType(mt).header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFileName() + "\"").body(resource);
     }

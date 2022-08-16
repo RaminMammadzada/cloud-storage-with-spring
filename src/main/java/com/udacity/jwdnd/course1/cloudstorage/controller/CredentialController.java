@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -26,7 +27,7 @@ public class CredentialController {
     }
 
     @PostMapping("/addOrEditCredential")
-    public String addOrEditNote(Credential credential, Authentication authentication) {
+    public String addOrEditNote(Credential credential, Authentication authentication, RedirectAttributes redirectAttributes) {
         SecureRandom random;
 
         if (credential.getCredentialId() == null) {
@@ -55,13 +56,14 @@ public class CredentialController {
 
             this.credentialService.editCredential(credential);
         }
-
+        redirectAttributes.addFlashAttribute("activeTab", "credentials");
         return "redirect:/home";
     }
 
     @GetMapping("/credentials/delete/{id}")
-    public String deleteCredential(@PathVariable("id") Integer credentialId) {
+    public String deleteCredential(@PathVariable("id") Integer credentialId, RedirectAttributes redirectAttributes) {
         this.credentialService.deleteCredential(credentialId);
+        redirectAttributes.addFlashAttribute("activeTab", "credentials");
         return "redirect:/home";
     }
 }
