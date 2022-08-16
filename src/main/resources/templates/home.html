@@ -18,13 +18,27 @@
             <div id="contentDiv" style="clear: right;">
                 <nav style="clear: right;">
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link active" id="nav-files-tab" data-toggle="tab" href="#nav-files" role="tab" aria-controls="nav-files" aria-selected="true">Files</a>
-                        <a class="nav-item nav-link" id="nav-notes-tab" data-toggle="tab" href="#nav-notes" role="tab" aria-controls="nav-notes" aria-selected="false">Notes</a>
-                        <a class="nav-item nav-link" id="nav-credentials-tab" data-toggle="tab" href="#nav-credentials" role="tab" aria-controls="nav-credentials" aria-selected="false">Credentials</a>
+                        <a class="nav-item nav-link"
+                           th:classappend="${#strings.equals(activeTab, 'files') || #strings.equals(activeTab, null) ? 'active' : ''}"
+                           id="nav-files-tab" data-toggle="tab" href="#nav-files" role="tab" aria-controls="nav-files"
+                           aria-selected="true">Files
+                        </a>
+                        <a class="nav-item nav-link"
+                           th:classappend="${#strings.equals(activeTab, 'notes') ? 'active' : ''}"
+                           id="nav-notes-tab" data-toggle="tab" href="#nav-notes" role="tab" aria-controls="nav-notes"
+                           aria-selected="false">Notes
+                        </a>
+                        <a class="nav-item nav-link"
+                           th:classappend="${#strings.equals(activeTab, 'credentials') ? 'active' : ''}"
+                           id="nav-credentials-tab" data-toggle="tab" href="#nav-credentials" role="tab"
+                           aria-controls="nav-credentials" aria-selected="false">Credentials
+                        </a>
                     </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
-                    <div class="tab-pane fade show active" id="nav-files" role="tabpanel" aria-labelledby="nav-files-tab">
+                    <div class="tab-pane fade show"
+                         th:classappend="${#strings.equals(activeTab, 'files') || #strings.equals(activeTab, null) ? 'show active' : ''}"
+                         id="nav-files" role="tabpanel" aria-labelledby="nav-files-tab">
                         <form action="#" enctype="multipart/form-data" th:action="@{/fileUpload}" method="POST">
                             <div class="container">
                                 <div class="row" style="margin: 1em;">
@@ -60,7 +74,9 @@
                             </table>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
+                    <div class="tab-pane fade"
+                         th:classappend="${#strings.equals(activeTab, 'notes') ? 'show active' : ''}"
+                         id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
                         <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
                             + Add a New Note
                         </button>
@@ -75,13 +91,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr th:each="note : ${notes}">
                                         <td>
-                                            <button type="button" class="btn btn-success">Edit</button>
-                                            <a class="btn btn-danger">Delete</a>
+                                            <button type="button" class="btn btn-success" th:onclick="showNoteModal(
+                                                [[${note.noteId}]], [[${note.noteTitle}]], [[${note.noteDescription}]]
+                                            )">Edit</button>
+                                            <a th:href="@{/notes/delete/{id}(id = ${note.noteId})}" class="btn btn-danger">Delete</a>
                                         </td>
-                                        <th scope="row">Example Note Title</th>
-                                        <td>Example Note Description </td>
+                                        <th th:text="${note.noteTitle}" scope="row">Example Note Title</th>
+                                        <td th:text="${note.noteDescription}">Example Note Description </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -97,7 +115,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="#" method="POST">
+                                        <form action="#" method="POST" th:action="@{/addOrEditNote}">
                                             <input type="hidden" name="noteId" id="note-id">
                                             <div class="form-group">
                                                 <label for="note-title" class="col-form-label">Title</label>
@@ -118,7 +136,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab">
+                    <div class="tab-pane fade"
+                         th:classappend="${#strings.equals(activeTab, 'credentials') ? 'show active' : ''}"
+                         id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab">
                         <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showCredentialModal()">
                             + Add a New Credential
                         </button>
@@ -134,14 +154,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
+                                <tr th:each="credential : ${credentials}">
                                     <td>
-                                        <button type="button" class="btn btn-success">Edit</button>
-                                        <a class="btn btn-danger">Delete</a>
+                                        <button type="button" class="btn btn-success" th:onclick="showCredentialModal(
+                                                [[${credential.credentialId}]], [[${credential.url}]], [[${credential.username}]],
+                                                 [[${encryptionService.decryptValue(credential.password, credential.key)}]]
+                                            )">Edit</button>
+                                        <a th:href="@{/credentials/delete/{id}(id = ${credential.credentialId})}" class="btn btn-danger">Delete</a>
                                     </td>
-                                    <th scope="row">Example Credential URL</th>
-                                    <td>Example Credential Username</td>
-                                    <td>Example Credential Password</td>
+                                    <th th:text="${credential.url}" scope="row">Example Credential URL</th>
+                                    <td th:text="${credential.username}">Example Credential Username</td>
+                                    <td th:text="${credential.password}">Example Credential Password</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -157,7 +180,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="#" method="POST">
+                                        <form action="#" method="POST" th:action="@{/addOrEditCredential}">
                                             <input type="hidden" name="credentialId" id="credential-id">
                                             <div class="form-group">
                                                 <label for="credential-url" class="col-form-label">URL</label>
@@ -192,6 +215,7 @@
 
         <!--For opening the note modal-->
         <script type="text/javascript">
+
             // For opening the note modal
             function showNoteModal(noteId, noteTitle, noteDescription) {
                 $('#note-id').val(noteId ? noteId : '');
