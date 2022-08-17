@@ -59,12 +59,9 @@ public class NoteTab {
     public void createNewNote(String title, String description) throws InterruptedException {
         this.clickNoteTab();
 
-        Thread.sleep(3000);
         this.clickNewNoteBtn();
         this.fillNote(title, description);
         this.submitNote();
-
-        Thread.sleep(3000);
     }
 
     public String getSuccessMessage(){
@@ -81,6 +78,5 @@ public class NoteTab {
     public void deleteNote() throws InterruptedException {
         this.clickNoteTab();
         this.javascriptExecutor.executeScript("arguments[0].click();", deleteNoteButtonField);
-        Thread.sleep(3000);
     }
 }
