@@ -31,6 +31,10 @@ public class CredentialController {
         SecureRandom random;
 
         if (credential.getCredentialId() == null) {
+            redirectAttributes.addFlashAttribute("credentialSuccess",true);
+            redirectAttributes.addFlashAttribute("credentialSuccessMessage",
+                    "Credential Is Added!");
+
             Integer userId = this.userService.getUser(authentication.getName()).getUserId();
             credential.setUserId(userId);
 
@@ -44,6 +48,9 @@ public class CredentialController {
             credential.setPassword(encryptedPassword);
             this.credentialService.addCredential(credential);
         } else {
+            redirectAttributes.addFlashAttribute("credentialSuccess",true);
+            redirectAttributes.addFlashAttribute("credentialSuccessMessage",
+                    "Credential Is Updated!");
 
             random = new SecureRandom();
             byte[] key = new byte[16];
@@ -63,6 +70,9 @@ public class CredentialController {
     @GetMapping("/credentials/delete/{id}")
     public String deleteCredential(@PathVariable("id") Integer credentialId, RedirectAttributes redirectAttributes) {
         this.credentialService.deleteCredential(credentialId);
+        redirectAttributes.addFlashAttribute("credentialSuccess",true);
+        redirectAttributes.addFlashAttribute("credentialSuccessMessage",
+                "Credential Is Deleted!");
         redirectAttributes.addFlashAttribute("activeTab", "credentials");
         return "redirect:/home";
     }

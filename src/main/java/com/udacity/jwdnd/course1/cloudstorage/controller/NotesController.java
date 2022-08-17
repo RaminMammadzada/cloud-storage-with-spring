@@ -23,10 +23,18 @@ public class NotesController {
     @PostMapping("/addOrEditNote")
     public String addOrEditNote(Note note, Authentication authentication, RedirectAttributes redirectAttributes) {
         if (note.getNoteId() == null) {
+            redirectAttributes.addFlashAttribute("noteSuccess",true);
+            redirectAttributes.addFlashAttribute("noteSuccessMessage",
+                    "Note Is Added!");
+
             Integer userId = this.userService.getUser(authentication.getName()).getUserId();
             note.setUserId(userId);
             this.noteService.addNote(note);
         } else {
+            redirectAttributes.addFlashAttribute("noteSuccess",true);
+            redirectAttributes.addFlashAttribute("noteSuccessMessage",
+                    "Note Is Updated!");
+
             this.noteService.editNote(note);
         }
 
@@ -37,6 +45,9 @@ public class NotesController {
     @GetMapping("/notes/delete/{id}")
     public String deleteNote(@PathVariable("id") Integer noteId, RedirectAttributes redirectAttributes) {
         this.noteService.deleteNote(noteId);
+        redirectAttributes.addFlashAttribute("noteSuccess",true);
+        redirectAttributes.addFlashAttribute("noteSuccessMessage",
+                "Note Is Deleted!");
         redirectAttributes.addFlashAttribute("activeTab", "notes");
         return "redirect:/home";
     }

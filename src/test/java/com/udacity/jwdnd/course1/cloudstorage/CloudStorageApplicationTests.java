@@ -20,6 +20,7 @@ class CloudStorageApplicationTests {
 	private int port;
 
 	private WebDriver driver;
+	public String baseURL;
 
 	@BeforeAll
 	static void beforeAll() {
@@ -29,6 +30,7 @@ class CloudStorageApplicationTests {
 	@BeforeEach
 	public void beforeEach() {
 		this.driver = new ChromeDriver();
+		baseURL = "http://localhost:" + port;
 	}
 
 	@AfterEach
@@ -40,14 +42,106 @@ class CloudStorageApplicationTests {
 
 	@Test
 	public void getLoginPage() {
-		driver.get("http://localhost:" + this.port + "/login");
+		driver.get(baseURL + "/login");
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
-	/**
-	 * PLEASE DO NOT DELETE THIS method.
-	 * Helper method for Udacity-supplied sanity checks.
-	 **/
+	@Test
+	public void getSignupPage() {
+		driver.get(baseURL + "/signup");
+		Assertions.assertEquals("Sign Up", driver.getTitle());
+	}
+
+	@Test
+	public void unauthorizedAccess() {
+		driver.get(baseURL + "/login");
+		LoginPage loginPage = new LoginPage(driver);
+		loginPage.login("saram", "saram");
+
+		Assertions.assertNotEquals("Home", driver.getTitle());
+	}
+
+	public void signupAndLogin() {
+		driver.get(baseURL + "/signup");
+		Assertions.assertEquals("Sign Up", driver.getTitle());
+
+		SignupPage signupPage = new SignupPage(driver);
+		signupPage.signup("Sara", "Mammadzada", "sara", "sara");
+
+		driver.get(baseURL + "/login");
+
+		LoginPage loginPage = new LoginPage(driver);
+		loginPage.login("sara", "sara");
+	}
+
+	@Test
+	public void testUserSignupAndLogin() {
+		this.signupAndLogin();
+		Assertions.assertEquals("Home", driver.getTitle());
+	}
+
+	@Test
+	public void addNewNote() throws InterruptedException {
+		this.signupAndLogin();
+
+		NoteTab noteTab = new NoteTab(driver);
+		noteTab.createNewNote("Note Title 1", "Note description 1");
+		Assertions.assertEquals("Note Is Added!", noteTab.getSuccessMessage());
+	}
+
+	@Test
+	public void editNote() throws InterruptedException {
+		this.signupAndLogin();
+
+		NoteTab notePage = new NoteTab(driver);
+		notePage.createNewNote("Note Title 1", "Note description 1");
+		notePage.editNote("Note title 1 updated", "Test updated description");
+		Assertions.assertEquals("Note Is Updated!", notePage.getSuccessMessage());
+	}
+
+	@Test
+	public void deleteNote() throws InterruptedException {
+		this.signupAndLogin();
+
+		NoteTab notePage = new NoteTab(driver);
+		notePage.createNewNote("Note Title 1", "Note description 1");
+		notePage.deleteNote();
+		Assertions.assertEquals("Note Is Deleted!", notePage.getSuccessMessage());
+	}
+
+	@Test
+	public void addNewCredential() {
+		this.signupAndLogin();
+
+		CredentialTab credentialPage = new CredentialTab(driver);
+		credentialPage.createNewCredential("Example url", "example_username", "example_pass");
+		Assertions.assertEquals("Credential Is Added!", credentialPage.getSuccessMessage());
+	}
+
+	@Test
+	public void editCredential() {
+		this.signupAndLogin();
+
+		CredentialTab credentialPage = new CredentialTab(driver);
+		credentialPage.createNewCredential("Example url", "example_username", "example_pass");
+		credentialPage.editCredential("Example url 2", "example_username_updated", "pass_updated");
+		Assertions.assertEquals("Credential Is Updated!", credentialPage.getSuccessMessage());
+	}
+
+	@Test
+	public void deleteCredential() {
+		this.signupAndLogin();
+
+		CredentialTab credentialPage = new CredentialTab(driver);
+		credentialPage.createNewCredential("Example url", "example_username", "example_pass");
+		credentialPage.deleteCredential();
+		Assertions.assertEquals("Credential Is Deleted!", credentialPage.getSuccessMessage());
+	}
+
+		/**
+         * PLEASE DO NOT DELETE THIS method.
+         * Helper method for Udacity-supplied sanity checks.
+         **/
 	private void doMockSignUp(String firstName, String lastName, String userName, String password){
 		// Create a dummy account for logging in later.
 
